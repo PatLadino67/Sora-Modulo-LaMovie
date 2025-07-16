@@ -1,9 +1,12 @@
+if (typeof window.laMovieModuleLoaded === 'undefined') {
+    window.laMovieModuleLoaded = true;
+
 // Funciones para el módulo LaMovie
 
 async function searchResults(keyword) {
     try {
         // Usar la API correcta según la configuración del sitio
-        const searchUrl = `https://la.movie/wp-json/wpf/v1/search?keyword=${encodeURIComponent(keyword)}`;
+        const searchUrl = `https://api.lamovie.app/wp-json/wpf/v1/search?keyword=${encodeURIComponent(keyword)}`;
         const response = await window.fetch(searchUrl);
         
         // Verificar si la respuesta es válida
@@ -56,7 +59,7 @@ async function extractDetails(url) {
         const slug = urlParts[2];
 
         // Usar la API correcta
-        const detailsUrl = `https://la.movie/wp-json/wpf/v1/view?slug=${slug}&type=${type.slice(0, -1)}`; // 'peliculas' -> 'pelicula'
+        const detailsUrl = `https://api.lamovie.app/wp-json/wpf/v1/view?slug=${slug}&type=${type.slice(0, -1)}`; // 'peliculas' -> 'pelicula'
         const response = await window.fetch(detailsUrl);
         
         if (!response.ok) {
@@ -112,7 +115,7 @@ async function extractEpisodes(url) {
         }
 
         // Para series y animes, obtenemos los episodios de la API.
-        const detailsUrl = `https://la.movie/wp-json/wpf/v1/view?slug=${slug}&type=${type.slice(0, -1)}`;
+        const detailsUrl = `https://api.lamovie.app/wp-json/wpf/v1/view?slug=${slug}&type=${type.slice(0, -1)}`;
         const response = await window.fetch(detailsUrl);
         
         if (!response.ok) {
@@ -172,7 +175,7 @@ async function extractStreamUrl(url) {
         }
 
         // 1. Obtener el ID del post usando la API correcta
-        const viewUrl = `https://la.movie/wp-json/wpf/v1/view?slug=${slug}&type=${type}`;
+        const viewUrl = `https://api.lamovie.app/wp-json/wpf/v1/view?slug=${slug}&type=${type}`;
         const viewResponse = await window.fetch(viewUrl);
         
         if (!viewResponse.ok) {
@@ -201,7 +204,7 @@ async function extractStreamUrl(url) {
         }
 
         // 2. Obtener el enlace del reproductor usando la API correcta
-        const playerUrl = `https://la.movie/wp-json/wpf/v1/player?post_id=${postId}`;
+        const playerUrl = `https://api.lamovie.app/wp-json/wpf/v1/player?post_id=${postId}`;
         const playerResponse = await window.fetch(playerUrl);
         
         if (!playerResponse.ok) {
@@ -352,4 +355,5 @@ function unpack(source) {
         return source;
     }
 }
-
+// Fin del código de deobfuscación
+}
