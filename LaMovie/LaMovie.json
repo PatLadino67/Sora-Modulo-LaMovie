@@ -1,0 +1,19 @@
+{
+   "sourceName": "La.Movie",
+   "iconUrl": "https://la.movie/wp-content/uploads/2025/05/cropped-La.movie_-192x192.png",
+   "author": {
+       "name": "PatLadino",
+       "icon": "https://sm.ign.com/t/ign_es/screenshot/default/popo_qycc.1200.jpg"
+   },
+   "version": "1.0.0",
+   "language": "Spanish",
+   "streamType": "HLS",
+   "quality": "720p",
+   "baseUrl": "https://la.movie",
+   "searchBaseUrl": "https://la.movie/wp-api/v1/search?keyword=%s",
+   "scriptUrl": "https://gist.githubusercontent.com/PatLadino67/6a41fda4e0fede639b0d0ebc22865f3c/raw/aa4cfddea3dcc14aed0be7dc521bf8789b799469/LaMovie.js",
+   "asyncJS": true,
+   "type": ["movies", "shows", "anime"],
+   "softsub": false
+}
+
