@@ -357,9 +357,11 @@ function unpack(source) {
 }
 // Fin del código de deobfuscación
 
-    // Export functions to window for Sora compatibility
-    window.searchResults = searchResults;
-    window.extractDetails = extractDetails;
-    window.extractEpisodes = extractEpisodes;
-    window.extractStreamUrl = extractStreamUrl;
+    // Export functions to window.LaMovie for Sora compatibility
+    window.LaMovie = {
+        searchResults,
+        extractDetails,
+        extractEpisodes,
+        extractStreamUrl
+    };
 }
