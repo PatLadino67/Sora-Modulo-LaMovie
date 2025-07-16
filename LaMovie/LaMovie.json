@@ -11,7 +11,7 @@
    "quality": "720p",
    "baseUrl": "https://la.movie",
    "searchBaseUrl": "https://api.lamovie.app/wp-json/wp/v2/posts?search=%s&_embed=wp:term",
-   "scriptUrl": "https://raw.githack.com/PatLadino67/Sora-Modulo-LaMovie/main/LaMovie/LaMovie.js",
+   "scriptUrl": "https://cdn.jsdelivr.net/gh/PatLadino67/Sora-Modulo-LaMovie@main/LaMovie/LaMovie.js",
    "asyncJS": true,
    "type": ["movies", "shows", "anime"],
    "softsub": false
