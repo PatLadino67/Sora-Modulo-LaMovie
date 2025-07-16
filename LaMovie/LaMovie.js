@@ -3,7 +3,7 @@
 async function searchResults(keyword) {
     try {
         const searchUrl = `https://la.movie/wp-api/v1/search?keyword=${encodeURIComponent(keyword)}`;
-        const response = await fetchv2(searchUrl);
+        const response = await fetch(searchUrl);
         const data = await response.json();
 
         const transformedResults = data.map(item => ({
@@ -30,7 +30,7 @@ async function extractDetails(url) {
         const slug = urlParts[2];
 
         const detailsUrl = `https://la.movie/wp-api/v1/view?slug=${slug}&type=${type.slice(0, -1)}`; // 'peliculas' -> 'pelicula'
-        const response = await fetchv2(detailsUrl);
+        const response = await fetch(detailsUrl);
         const data = await response.json();
 
         const details = data.post;
@@ -68,7 +68,7 @@ async function extractEpisodes(url) {
 
         // Para series y animes, obtenemos los episodios de la API.
         const detailsUrl = `https://la.movie/wp-api/v1/view?slug=${slug}&type=${type.slice(0, -1)}`;
-        const response = await fetchv2(detailsUrl);
+        const response = await fetch(detailsUrl);
         const data = await response.json();
 
         if (!data.seasons || data.seasons.length === 0) {
@@ -108,13 +108,13 @@ async function extractStreamUrl(url) {
 
         // 1. Obtener el ID del post
         const viewUrl = `https://la.movie/wp-api/v1/view?slug=${slug}&type=${type}`;
-        const viewResponse = await fetchv2(viewUrl);
+        const viewResponse = await fetch(viewUrl);
         const viewData = await viewResponse.json();
         const postId = viewData.post.ID;
 
         // 2. Obtener el enlace del reproductor
         const playerUrl = `https://la.movie/wp-api/v1/player?post_id=${postId}`;
-        const playerResponse = await fetchv2(playerUrl);
+        const playerResponse = await fetch(playerUrl);
         const playerData = await playerResponse.json();
         
         // Tomamos la primera opción de idioma (ej. Latino)
@@ -122,7 +122,7 @@ async function extractStreamUrl(url) {
         if (!embedUrl) return null;
 
         // 3. Obtener el HTML del reproductor
-        const embedResponse = await fetchv2(embedUrl);
+        const embedResponse = await fetch(embedUrl);
         const embedHtml = await embedResponse.text();
 
         // 4. Desofuscar el script para encontrar el enlace del stream
