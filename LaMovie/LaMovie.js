@@ -235,6 +235,3 @@ function unpack(source) {
         return source;
     }
 }
-        return source;
-    }
-}
