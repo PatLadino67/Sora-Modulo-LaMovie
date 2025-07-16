@@ -10,7 +10,7 @@
    "streamType": "HLS",
    "quality": "720p",
    "baseUrl": "https://la.movie",
-   "searchBaseUrl": "https://la.movie/wp-api/v1/search?keyword=%s",
+   "searchBaseUrl": "https://api.lamovie.app/wp-json/wp/v2/posts?search=%s&_embed=wp:term",
    "scriptUrl": "https://raw.githubusercontent.com/PatLadino67/Sora-Modulo-LaMovie/refs/heads/main/LaMovie/LaMovie.js",
    "asyncJS": true,
    "type": ["movies", "shows", "anime"],
