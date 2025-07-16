@@ -2,14 +2,40 @@
 
 async function searchResults(keyword) {
     try {
-        const searchUrl = `https://la.movie/wp-api/v1/search?keyword=${encodeURIComponent(keyword)}`;
+        // Usar la API correcta según la configuración del sitio
+        const searchUrl = `https://la.movie/wp-json/wpf/v1/search?keyword=${encodeURIComponent(keyword)}`;
         const response = await fetch(searchUrl);
-        const data = await response.json();
+        
+        // Verificar si la respuesta es válida
+        if (!response.ok) {
+            console.log(`Error HTTP: ${response.status}`);
+            return [];
+        }
+        
+        const text = await response.text();
+        if (!text.trim()) {
+            console.log('Respuesta vacía del servidor');
+            return [];
+        }
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (parseError) {
+            console.log('Error al parsear JSON:', parseError);
+            return [];
+        }
+
+        // Verificar si data es un array
+        if (!Array.isArray(data)) {
+            console.log('La respuesta no es un array:', data);
+            return [];
+        }
 
         const transformedResults = data.map(item => ({
-            title: item.title,
-            image: item.poster,
-            href: item.permalink
+            title: item.title || item.post_title || 'Título no disponible',
+            image: item.poster || item.thumbnail || '',
+            href: item.permalink || item.url || ''
         }));
         
         return transformedResults;
@@ -29,17 +55,36 @@ async function extractDetails(url) {
         const type = urlParts[1];
         const slug = urlParts[2];
 
-        const detailsUrl = `https://la.movie/wp-api/v1/view?slug=${slug}&type=${type.slice(0, -1)}`; // 'peliculas' -> 'pelicula'
+        // Usar la API correcta
+        const detailsUrl = `https://la.movie/wp-json/wpf/v1/view?slug=${slug}&type=${type.slice(0, -1)}`; // 'peliculas' -> 'pelicula'
         const response = await fetch(detailsUrl);
-        const data = await response.json();
+        
+        if (!response.ok) {
+            console.log(`Error HTTP en detalles: ${response.status}`);
+            return [{}];
+        }
+        
+        const text = await response.text();
+        if (!text.trim()) {
+            console.log('Respuesta vacía en detalles');
+            return [{}];
+        }
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (parseError) {
+            console.log('Error al parsear JSON en detalles:', parseError);
+            return [{}];
+        }
 
-        const details = data.post;
-        const meta = data.meta;
+        const details = data.post || {};
+        const meta = data.meta || {};
 
         const transformedDetails = [{
-            description: details.post_content || 'No hay descripción disponible.',
-            aliases: meta.original_title || '',
-            airdate: meta.air_date || ''
+            description: details.post_content || meta.overview || 'No hay descripción disponible.',
+            aliases: meta.original_title || details.original_title || '',
+            airdate: meta.air_date || meta.release_date || ''
         }];
 
         return transformedDetails;
@@ -67,9 +112,27 @@ async function extractEpisodes(url) {
         }
 
         // Para series y animes, obtenemos los episodios de la API.
-        const detailsUrl = `https://la.movie/wp-api/v1/view?slug=${slug}&type=${type.slice(0, -1)}`;
+        const detailsUrl = `https://la.movie/wp-json/wpf/v1/view?slug=${slug}&type=${type.slice(0, -1)}`;
         const response = await fetch(detailsUrl);
-        const data = await response.json();
+        
+        if (!response.ok) {
+            console.log(`Error HTTP en episodios: ${response.status}`);
+            return [];
+        }
+        
+        const text = await response.text();
+        if (!text.trim()) {
+            console.log('Respuesta vacía en episodios');
+            return [];
+        }
+        
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (parseError) {
+            console.log('Error al parsear JSON en episodios:', parseError);
+            return [];
+        }
 
         if (!data.seasons || data.seasons.length === 0) {
             return [];
@@ -77,12 +140,14 @@ async function extractEpisodes(url) {
 
         let allEpisodes = [];
         data.seasons.forEach(season => {
-            season.episodes.forEach(episode => {
-                allEpisodes.push({
-                    href: episode.permalink,
-                    number: episode.post_name.replace('episodio-', '') // Extrae el número del episodio
+            if (season.episodes && Array.isArray(season.episodes)) {
+                season.episodes.forEach(episode => {
+                    allEpisodes.push({
+                        href: episode.permalink || episode.url || '',
+                        number: episode.post_name ? episode.post_name.replace('episodio-', '') : episode.episode_number || '1'
+                    });
                 });
-            });
+            }
         });
 
         return allEpisodes;
@@ -106,28 +171,80 @@ async function extractStreamUrl(url) {
             type = type.slice(0, -1);
         }
 
-        // 1. Obtener el ID del post
-        const viewUrl = `https://la.movie/wp-api/v1/view?slug=${slug}&type=${type}`;
+        // 1. Obtener el ID del post usando la API correcta
+        const viewUrl = `https://la.movie/wp-json/wpf/v1/view?slug=${slug}&type=${type}`;
         const viewResponse = await fetch(viewUrl);
-        const viewData = await viewResponse.json();
-        const postId = viewData.post.ID;
+        
+        if (!viewResponse.ok) {
+            console.log(`Error HTTP en stream view: ${viewResponse.status}`);
+            return null;
+        }
+        
+        const viewText = await viewResponse.text();
+        if (!viewText.trim()) {
+            console.log('Respuesta vacía en stream view');
+            return null;
+        }
+        
+        let viewData;
+        try {
+            viewData = JSON.parse(viewText);
+        } catch (parseError) {
+            console.log('Error al parsear JSON en stream view:', parseError);
+            return null;
+        }
+        
+        const postId = viewData.post?.ID;
+        if (!postId) {
+            console.log('No se encontró ID del post');
+            return null;
+        }
 
-        // 2. Obtener el enlace del reproductor
-        const playerUrl = `https://la.movie/wp-api/v1/player?post_id=${postId}`;
+        // 2. Obtener el enlace del reproductor usando la API correcta
+        const playerUrl = `https://la.movie/wp-json/wpf/v1/player?post_id=${postId}`;
         const playerResponse = await fetch(playerUrl);
-        const playerData = await playerResponse.json();
+        
+        if (!playerResponse.ok) {
+            console.log(`Error HTTP en player: ${playerResponse.status}`);
+            return null;
+        }
+        
+        const playerText = await playerResponse.text();
+        if (!playerText.trim()) {
+            console.log('Respuesta vacía en player');
+            return null;
+        }
+        
+        let playerData;
+        try {
+            playerData = JSON.parse(playerText);
+        } catch (parseError) {
+            console.log('Error al parsear JSON en player:', parseError);
+            return null;
+        }
         
         // Tomamos la primera opción de idioma (ej. Latino)
-        const embedUrl = playerData[0].url;
-        if (!embedUrl) return null;
+        const embedUrl = playerData[0]?.url;
+        if (!embedUrl) {
+            console.log('No se encontró URL del embed');
+            return null;
+        }
 
         // 3. Obtener el HTML del reproductor
         const embedResponse = await fetch(embedUrl);
+        if (!embedResponse.ok) {
+            console.log(`Error HTTP en embed: ${embedResponse.status}`);
+            return null;
+        }
+        
         const embedHtml = await embedResponse.text();
 
         // 4. Desofuscar el script para encontrar el enlace del stream
         const obfuscatedScriptMatch = embedHtml.match(/eval\(function\(p,a,c,k,e,d\){.*?}\(.*?split\('\|'\)\)\)/);
-        if (!obfuscatedScriptMatch) return null;
+        if (!obfuscatedScriptMatch) {
+            console.log('No se encontró script ofuscado');
+            return null;
+        }
 
         const unpackedScript = unpack(obfuscatedScriptMatch[0]);
         
@@ -235,3 +352,4 @@ function unpack(source) {
         return source;
     }
 }
+
