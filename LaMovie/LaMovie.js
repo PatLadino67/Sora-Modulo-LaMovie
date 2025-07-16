@@ -6,7 +6,7 @@ if (typeof window.laMovieModuleLoaded === 'undefined') {
 async function searchResults(keyword) {
     try {
         // Usar la API correcta según la configuración del sitio
-        const searchUrl = `https://api.lamovie.app/wp-json/wpf/v1/search?keyword=${encodeURIComponent(keyword)}`;
+        const searchUrl = `https://api.lamovie.app/wp-json/wp/v2/posts?search=${encodeURIComponent(keyword)}&_embed=wp:term`;
         const response = await window.fetch(searchUrl);
         
         // Verificar si la respuesta es válida
