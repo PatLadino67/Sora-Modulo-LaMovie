@@ -1,3 +1,18 @@
+/*
+sora-metadata:
+{
+  "name": "Pelisplushd",
+  "version": "1.0.0",
+  "description": "Módulo para Pelisplushd.lat",
+  "author": "YourName",
+  "language": "javascript",
+  "type": "module",
+  "nsfw": false,
+  "icon": "https://pelisplushd.lat/favicon.ico",
+  "url": "https://pelisplushd.lat"
+}
+*/
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////       Main Functions          //////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////
