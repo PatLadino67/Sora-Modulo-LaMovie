@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "author": "GitHub Copilot",
     "description": "Módulo para PelisplusHD",
-    "script": "pelisplus.js",
+    "script": "https://raw.githubusercontent.com/PatLadino67/Sora-Modulo-LaMovie/refs/heads/main/LaMovie/pelisplus.js",
     "domains": ["pelisplushd.to"],
     "search_path": "/search?s=",
     "search_sufix": "",
